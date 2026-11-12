@@ -1,0 +1,30 @@
+[package]
+name = "ctrlaltnotes-core"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+description = "End-to-end encrypted Markdown notes: vault format v1, sync, bundle"
+license = "AGPL-3.0-only"
+publish = false
+
+[dependencies]
+# Versions are pinned to the lines whose APIs this code was written against.
+# (argon2 0.6 and chacha20poly1305 0.11 have different APIs: do not bump blindly.)
+argon2 = "0.5.3"
+chacha20poly1305 = "0.10.1"
+hkdf = "0.12"
+sha2 = "0.10"
+zeroize = "1"
+getrandom = "0.2"
+base64 = "0.22"
+hex = "0.4"
+unicode-normalization = "0.1"
+serde_json = "1"
+
+[features]
+# Only for the test-suite (forging merged states); never enabled in the apps.
+test-hooks = []
+
+[dev-dependencies]
+tempfile = "3"
+ctrlaltnotes-core = { path = ".", features = ["test-hooks"] }

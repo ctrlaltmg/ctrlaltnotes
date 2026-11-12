@@ -1,0 +1,19 @@
+target/
+app/gen/schemas/
+*.canb
+.DS_Store
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.p8
+*.mobileprovision
+__pycache__/
+*.pyc
+.venv/
+# test vaults and exports must never be committed
+**/vault.json
+**/state.can
+**/quick.json
+*.zip

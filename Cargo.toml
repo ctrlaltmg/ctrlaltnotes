@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+members = ["crates/core", "crates/service", "crates/server", "app"]
+# Plain `cargo test` / `cargo build` skip the desktop shell; build it with `cargo tauri build`.
+default-members = ["crates/core", "crates/service", "crates/server"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true
+opt-level = "s"

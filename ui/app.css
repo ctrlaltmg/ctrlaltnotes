@@ -1,0 +1,168 @@
+/* SPDX-License-Identifier: AGPL-3.0-only */
+/* Theme: dark by default; <html data-theme="light|system"> switches it (Settings → Appearance). */
+:root{--bg:#161615;--panel:#1c1c1b;--fg:#e8e8e5;--mute:#8d8d88;--line:#2c2c2a;--acc:#7fb5a3;--danger:#e07a7a;color-scheme:dark;--logo-l:none;--logo-d:block;
+--mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;--sans:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+:root[data-theme=light]{--bg:#fbfbfa;--panel:#f4f4f2;--fg:#1c1c1b;--mute:#7a7a76;--line:#e4e4e0;--acc:#2f5d50;--danger:#a33;color-scheme:light;--logo-l:block;--logo-d:none}
+@media (prefers-color-scheme:light){:root[data-theme=system]{--bg:#fbfbfa;--panel:#f4f4f2;--fg:#1c1c1b;--mute:#7a7a76;--line:#e4e4e0;--acc:#2f5d50;--danger:#a33;color-scheme:light;--logo-l:block;--logo-d:none}}
+*{box-sizing:border-box}html,body,#app{height:100%;margin:0}
+body{background:var(--bg);color:var(--fg);font:15px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+button,input,textarea,select{font:inherit;color:inherit}
+button{background:none;border:0;padding:.25rem .5rem;border-radius:6px;cursor:pointer;color:var(--mute)}
+button:hover,button:focus-visible{color:var(--fg);background:var(--line);outline:none}
+:focus-visible{outline:2px solid var(--acc);outline-offset:1px}
+.lock{display:grid;place-items:center;height:100%;padding:16px}
+.lock form,.lock .form{width:min(340px,100%);display:grid;gap:14px}
+.lock h1{font-size:1.1rem;font-weight:500;letter-spacing:.02em;margin:0 0 6px}
+.lock input{width:100%;padding:.65rem .75rem;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.lock .go{background:var(--fg);color:var(--bg);padding:.6rem;border-radius:8px}
+.lock .go:hover{background:var(--fg);color:var(--bg);opacity:.88}
+.lock .alt{font-size:.85rem;text-align:center}
+.err{color:var(--danger);font-size:.85rem;min-height:1.2em}
+.shell{display:grid;grid-template-columns:var(--sw,280px) 1fr;height:100%}
+aside{background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0;position:relative;overflow:hidden}
+.bar{display:flex;gap:2px;align-items:center;padding:10px 10px 6px}
+.bar .grow{flex:1}.bar .brand{font-weight:600;letter-spacing:.02em;padding-left:6px}
+.search{margin:4px 12px 8px;padding:.4rem .6rem;border:1px solid var(--line);border-radius:7px;background:var(--bg)}
+.tree{overflow:auto;padding:2px 6px 16px;flex:1}
+.row{display:flex;align-items:center;gap:4px;padding:3px 6px;border-radius:6px;cursor:pointer;user-select:none;white-space:nowrap}
+.row:hover{background:var(--line)}.row.sel{background:var(--line);font-weight:500}
+.row .t{overflow:hidden;text-overflow:ellipsis;flex:1}
+.row .m{opacity:0;padding:0 .35rem}.row:hover .m,.row:focus-within .m{opacity:1}
+.caret{width:1em;color:var(--mute);font-size:.75rem}
+.kids{margin-left:14px;border-left:1px solid var(--line);padding-left:4px}
+.empty{color:var(--mute);padding:24px;text-align:center}
+main{display:flex;flex-direction:column;min-width:0;min-height:0}
+.top{display:flex;align-items:center;gap:8px;padding:10px 22px;color:var(--mute);font-size:.85rem}
+.top .grow{flex:1}.top .ok{color:var(--acc)}
+.doc{flex:1;overflow:auto;padding:8px 22px 60px}
+.page{max-width:720px;margin:0 auto}
+.title{width:100%;border:0;background:none;font-size:1.7rem;font-weight:600;padding:.2rem 0;margin:0 0 .5rem;outline:none}
+.ed{width:100%;min-height:60vh;border:0;resize:none;background:none;outline:none;font:14px/1.7 var(--mono);padding:0}
+.md h1,.md h2,.md h3{line-height:1.25;margin:1.4em 0 .5em}.md h1{font-size:1.5rem}.md h2{font-size:1.25rem}.md h3{font-size:1.08rem}
+.md p,.md ul,.md ol,.md pre,.md blockquote{margin:.7em 0}
+.md code{font-family:var(--mono);font-size:.88em;background:var(--panel);padding:.1em .35em;border-radius:4px}
+.md pre{background:var(--panel);padding:12px 14px;border-radius:8px;overflow:auto}.md pre code{background:none;padding:0}
+.md blockquote{border-left:3px solid var(--line);margin-left:0;padding-left:14px;color:var(--mute)}
+.md a{color:var(--acc)}.md hr{border:0;border-top:1px solid var(--line);margin:1.6em 0}
+.md li input{margin-right:.5em}
+.menu{position:fixed;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px;box-shadow:0 6px 24px #0002;z-index:9;min-width:150px}
+.menu button{display:block;width:100%;text-align:left;color:var(--fg)}.menu .del{color:var(--danger)}
+.toast{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:var(--fg);color:var(--bg);padding:.5rem .9rem;border-radius:8px;font-size:.85rem}
+.menu-btn{display:none}
+@media (max-width:720px){.shell{grid-template-columns:1fr}aside{position:fixed;inset:0 25% 0 0;z-index:5;transform:translateX(-101%);transition:transform .15s}
+.shell.nav aside{transform:none;box-shadow:0 0 40px #0004}.menu-btn{display:inline-block}.doc,.top{padding-left:14px;padding-right:14px}}
+.dlg{left:50%;top:30%;transform:translateX(-50%);padding:10px}.dlg-in{width:260px;margin:6px}.dlg-lbl{padding:0 6px;color:var(--mute)}
+/* ---- additions for the Rust edition ---- */
+.lock .sub{color:var(--mute);font-size:.85rem;margin:-6px 0 4px}
+.lock label.chk{display:flex;gap:8px;align-items:flex-start;font-size:.85rem;color:var(--mute)}
+.lock label.chk input{width:auto;margin-top:.3rem}
+.lock .go[disabled]{opacity:.4;cursor:not-allowed}
+.meter{height:4px;border-radius:2px;background:var(--line);overflow:hidden}.meter>i{display:block;height:100%;width:0;background:var(--danger);transition:width .15s}
+.meter.ok>i{background:var(--acc)}
+.hint{font-size:.8rem;color:var(--mute);min-height:1.2em}
+.reckey{font:15px/1.7 var(--mono);padding:12px 14px;border:1px dashed var(--line);border-radius:8px;background:var(--panel);word-break:break-all;user-select:all}
+.lock .row2{display:flex;gap:8px}.lock .row2>*{flex:1}
+.lock .link{font-size:.85rem;text-align:center}
+/* lock screens: switch to another vault folder, deliberately quiet */
+.vaultsw{display:flex;flex-wrap:wrap;gap:2px 6px;justify-content:center;align-items:center;margin-top:6px;font-size:.78rem;color:var(--mute);opacity:.7}
+.vaultsw:hover,.vaultsw:focus-within{opacity:1}
+.vaultsw button{font-size:inherit;padding:.1rem .35rem;color:inherit}
+.vaultsw .vname{max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ov{position:fixed;inset:0;background:#0006;z-index:8;display:grid;place-items:center;padding:16px}
+.ov .dlg{position:static;transform:none;width:min(380px,100%);padding:16px;display:grid;gap:10px;min-width:0;background:var(--bg);color:var(--fg);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 40px #0004}
+.ov .dlg h2{margin:0;font-size:1rem;font-weight:600}
+.ov .dlg input:not([type=checkbox]){width:100%;padding:.5rem .65rem;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+.ov .dlg input[type=checkbox]{width:auto;flex:none}
+.ov .dlg .btns{display:flex;gap:8px;justify-content:flex-end}
+.ov .dlg .primary{background:var(--fg);color:var(--bg)}
+.ov .dlg .primary:hover{background:var(--fg);color:var(--bg);opacity:.88}
+.ov .dlg .reckey{margin:4px 0}
+/* ---- editor: toolbar, split live preview ---- */
+.page.wide{max-width:1180px}
+.tbar{display:flex;flex-wrap:wrap;gap:2px;align-items:center;padding:4px 0 8px;border-bottom:1px solid var(--line);margin-bottom:10px;position:sticky;top:0;background:var(--bg);z-index:2}
+.tbar button{min-width:2rem;padding:.2rem .5rem;font-size:.82rem}.tbar .sep{width:1px;height:1.2rem;background:var(--line);margin:0 4px}
+.split{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.split .ed{min-height:68vh}.split .md{border-left:1px solid var(--line);padding-left:24px;min-height:68vh;overflow-wrap:anywhere}
+@media (max-width:900px){.split{grid-template-columns:1fr}.split .md{border-left:0;padding-left:0;border-top:1px solid var(--line);padding-top:12px}}
+.md u{text-underline-offset:2px}.md mark{background:#ffe58a;color:#1c1c1b;border-radius:3px;padding:0 .15em;-webkit-box-decoration-break:clone;box-decoration-break:clone}
+/* anything inside a highlight stays on the yellow and keeps the dark text, in every theme
+   (theme colours such as the code background or the accent would be unreadable on yellow) */
+.md mark code{background:#0000001a;color:inherit}
+.md mark a,.md mark s,.md mark u,.md mark em,.md mark strong{color:inherit}
+.md table{border-collapse:collapse;margin:.8em 0;max-width:100%;display:block;overflow:auto}
+.md th,.md td{border:1px solid var(--line);padding:.35em .7em}.md th{background:var(--panel);font-weight:600}
+.md .al-c{text-align:center}.md .al-r{text-align:right}.md .al-l{text-align:left}
+/* ---- settings + export dialogs ---- */
+.ov .dlg.wide{width:min(620px,100%);max-height:88vh;overflow:auto;display:block;padding:18px 20px}
+.dhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.sbody h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:18px 0 4px;font-weight:600}
+.srow{display:flex;gap:16px;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--line);cursor:default}
+.stext{display:grid;gap:2px;min-width:0}.stext small{color:var(--mute);font-size:.8rem;line-height:1.35;overflow-wrap:anywhere}
+.srow select{padding:.3rem .5rem;border:1px solid var(--line);border-radius:7px;background:var(--panel)}
+.sw{appearance:none;-webkit-appearance:none;width:42px;height:24px;border-radius:12px;background:var(--line);position:relative;cursor:pointer;flex:none;border:0;padding:0;transition:background .15s}
+.sw::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:var(--bg);transition:transform .15s}
+.sw[aria-checked=true]{background:var(--acc)}.sw[aria-checked=true]::after{transform:translateX(18px)}
+
+.btnrow{display:flex;gap:4px;flex-wrap:wrap}
+.xlist{max-height:44vh;overflow:auto;border:1px solid var(--line);border-radius:8px;padding:6px;margin:8px 0;background:var(--panel)}
+.xrow{display:flex;gap:8px;align-items:center;padding:2px 4px;border-radius:5px;cursor:pointer}.xrow:hover{background:var(--line)}
+.xrow.x1{padding-left:22px}.xrow.x2{padding-left:40px}.xrow.x3{padding-left:58px}.xrow.x4{padding-left:76px}.xrow.x5,.xrow.x6,.xrow.x7,.xrow.x8{padding-left:94px}
+.xf{font-weight:500}
+.ov .dlg.wide .btns{margin-top:10px}
+/* ---- password helpers ---- */
+.pwfields{display:grid;gap:10px}.pwfields input{width:100%;padding:.65rem .75rem;border:1px solid var(--line);border-radius:8px;background:var(--panel)}
+.mini{font-size:.8rem;border:1px solid var(--line)}
+.lock .alt2{background:var(--panel);color:var(--fg);border:1px solid var(--line)}.lock .alt2:hover{background:var(--line);color:var(--fg)}
+[hidden]{display:none!important}
+
+/* ---- brand ---- */
+.logo{display:flex;justify-content:center;margin:0 0 10px}
+.logo img{height:64px;width:auto;max-width:100%}
+.logo-l{display:var(--logo-l)}.logo-d{display:var(--logo-d)}
+
+.bar .brand{display:inline-flex;align-items:center;gap:8px}
+.bar .brand .mark{width:20px;height:20px;border-radius:5px}
+.srow button{white-space:nowrap}
+
+/* ---- no visible scrollbars: scrolling still works with the wheel / trackpad / touch / keyboard,
+   follows the caret while typing, and stops at the top and bottom (no rubber-band, no chaining) ---- */
+*{scrollbar-width:none;-ms-overflow-style:none}
+*::-webkit-scrollbar{width:0;height:0;display:none}
+.doc,.ed,.tree,.xlist,.md pre,.md table,.ov .dlg.wide{overscroll-behavior:contain}
+.ed{overflow-y:auto}
+html,body{overscroll-behavior:none}
+
+/* single-pane live preview */
+.live{padding-bottom:30vh}
+.blk{cursor:text;border-radius:6px;padding:0 8px;margin:0 -8px}.blk:not(.ro):not(.editing):hover{background:var(--panel)}.blk.ro{cursor:default}
+.blk.editing{background:var(--panel)}
+.blk-ed{display:block;width:100%;border:0;resize:none;background:none;outline:none;font:14px/1.7 var(--mono);padding:6px 0;overflow:hidden;color:inherit}
+.addblk{min-height:34vh;cursor:text;color:var(--mute);padding:8px}.addblk.empty{min-height:50vh}
+/* sidebar footer: Lock centred, New note / New folder beside it */
+.sfoot{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;padding:8px 10px;border-top:1px solid var(--line)}
+.sfoot button{white-space:nowrap}.sfoot .lockbtn{font-weight:600;justify-self:center}
+.sfoot .icon{display:inline-grid;place-items:center;width:34px;height:30px;padding:0;color:var(--mute)}.sfoot .icon:hover{color:var(--fg)}
+.lockmini{display:none!important}
+
+/* logo: always its original size (the width of the start sidebar), however wide the sidebar is */
+.sidelogo{flex:none;width:280px;padding:16px 12px 8px;box-sizing:border-box}.sidelogo .sidemark{display:none}.sidelogo img{width:256px;max-width:none;height:auto}.sidelogo .logo-l{display:var(--logo-l)}.sidelogo .logo-d{display:var(--logo-d)}
+/* sidebar resize handle */
+.resizer{position:absolute;top:0;right:-3px;bottom:0;width:7px;cursor:col-resize;z-index:6;touch-action:none}
+.resizer:hover,.resizer:focus-visible,body.resizing .resizer{background:var(--acc);opacity:.35;outline:none}
+body.resizing{cursor:col-resize;user-select:none}
+/* sidebar switched off: a thin strip keeps the toggle (and a lock) reachable */
+@media (min-width:721px){
+  .shell.collapsed{grid-template-columns:48px 1fr}
+  .shell.collapsed .search,.shell.collapsed .tree,.shell.collapsed .resizer,.shell.collapsed .lockbtn,.shell.collapsed .sfoot-sp{display:none}
+  .shell.collapsed aside{justify-content:flex-end}
+  /* collapsed: the square app icon stays in the same top spot instead of leaving it blank */
+  .shell.collapsed .sidelogo{width:auto;margin-bottom:auto;padding:16px 0 8px;display:flex;justify-content:center}
+  .shell.collapsed .sidelogo .logo-l,.shell.collapsed .sidelogo .logo-d{display:none}
+  .shell.collapsed .sidelogo .sidemark{display:block;width:30px;height:30px}
+  .shell.collapsed .sfoot{display:flex;flex-direction:column-reverse;gap:6px;border-top:0;padding:8px 6px}
+  .shell.collapsed .lockmini{display:inline-grid!important}
+}
+@media (max-width:720px){.resizer,#side-toggle{display:none}.sfoot{grid-template-columns:1fr}}
+/* drag and drop */
+.row.dragging{opacity:.45}.row.drop{background:var(--acc-soft,var(--line));outline:1px solid var(--acc);outline-offset:-1px}
+.tree.droproot{outline:2px dashed var(--acc);outline-offset:-4px;border-radius:8px}

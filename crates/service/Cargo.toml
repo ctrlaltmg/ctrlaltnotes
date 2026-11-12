@@ -1,0 +1,16 @@
+[package]
+name = "ctrlaltnotes-service"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.80"
+description = "Shared application logic: one command dispatcher used by the web server and the native apps"
+license = "AGPL-3.0-only"
+publish = false
+
+[dependencies]
+ctrlaltnotes-core = { path = "../core" }
+serde_json = "1"
+sha2 = "0.10"
+
+[dev-dependencies]
+tempfile = "3"

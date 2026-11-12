@@ -1,0 +1,6 @@
+# Every change needs the maintainer's review; crypto, vault format and sync especially.
+*                    @ctrlaltmg
+/crates/core/        @ctrlaltmg
+/crates/service/     @ctrlaltmg
+/deny.toml           @ctrlaltmg
+/.github/            @ctrlaltmg

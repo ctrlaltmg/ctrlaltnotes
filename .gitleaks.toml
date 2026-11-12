@@ -1,0 +1,10 @@
+# gitleaks: default rules, minus build output that is never committed (see .gitignore).
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "local build output (gitignored)"
+paths = [
+  '''^target/''',
+  '''^app/gen/schemas/''',
+]
