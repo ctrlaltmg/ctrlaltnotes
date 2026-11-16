@@ -12,7 +12,7 @@ publish = false
 # (argon2 0.6 and chacha20poly1305 0.11 have different APIs: do not bump blindly.)
 argon2 = "0.5.3"
 chacha20poly1305 = "0.10.1"
-hkdf = "0.12"
+hkdf = "0.13"
 sha2 = "0.10"
 zeroize = "1"
 getrandom = "0.2"
