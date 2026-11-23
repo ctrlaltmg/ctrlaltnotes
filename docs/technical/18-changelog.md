@@ -5,8 +5,19 @@ order: 18
 ---
 # Changelog
 
-## Unreleased
+## 0.1.0-alpha.1
 
+First public release, for testing. Not code-signed yet; verify downloads as described in [Install and open](../guide/02-install-and-open.md).
+
+
+* **Hardening** (see [Hardening checklist](19-hardening.md)):
+  * desktop window: no default Tauri permissions, frozen JavaScript prototypes, navigation guard;
+  * Rust: overflow checks in release builds, workspace lints, exact toolchain pin;
+  * CI: every GitHub Action pinned to a commit SHA, OpenSSF Scorecard;
+  * website: Trusted Types, COEP and Origin-Agent-Cluster headers, a check that fails on any third-party load.
+  * dependencies: `url` 2.5.9 (RUSTSEC-2026-0592, stack overflow on nested `blob:` URLs) and `cookie` 0.18.3 (RUSTSEC-2026-0594, used inside Tauri).
+* **Website:** Markdown version of the home page for AI agents; shorter titles and description; features now list Linux, themes and multiple vaults.
+* Fix: docs search showed no results because of a wrong field name.
 * **Theme setting** (Settings → Appearance, first option): Dark (default), Light, or Match system. Stored app-wide; applied before first paint by `theme.js`.
 * **Open a different vault folder** from the create and unlock screens (desktop). Each vault keeps its own settings and sync target; the choice is remembered; **Use the default vault** goes back.
 * **Linux** desktop app: `.deb`, `.rpm` and AppImage bundles from the same backend.
@@ -15,7 +26,7 @@ order: 18
 * Release gate `scripts/check.sh` and a CI workflow (Linux, macOS, Windows); `forbid(unsafe_code)` extended to the desktop shell and the web binary.
 * User guide rewritten in plain language.
 
-## 0.1.0
+## Development before the first release
 
 * New **When the app opens** setting (blank page or last edited note). Live preview and toolbar are switched on or off in Settings only.
 * **Live preview is a side-by-side editor**: Markdown on the left, the formatted note on the right. Turned off in Settings, only the Markdown editor shows. The **Preview** button shows only the rendered text.
@@ -24,7 +35,6 @@ order: 18
 * **Drag and drop** of notes and folders between folders and to the top level.
 * The top bar has only Preview and Settings; Lock sits at the bottom of the sidebar.
 * Single product name everywhere: crates, vault format labels (`ctrlaltnotes-vault`, `CAN1`), object files (`.can`), data folder and app identifier. There is no compatibility layer for earlier prototypes.
-* Website and documentation moved to their own folder, `ctrlaltnotes-website/`, separate from the application.
 * Renamed to **CtrlAltNotes**; new notes icon and logo; icons regenerated for every platform.
 * Sync button removed; automatic sync is a switch in **Settings** (on by default).
 * Settings in a popup window; live Markdown preview; optional formatting toolbar with extended syntax (tables, task lists, underline, highlight).

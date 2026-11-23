@@ -1,0 +1,6 @@
+# Exact compiler for every build (local, CI, releases): reproducible builds, no surprise upgrades.
+# Bump deliberately, then run ./scripts/check.sh.
+[toolchain]
+channel = "1.99.1"
+components = ["rustfmt", "clippy"]
+profile = "minimal"

@@ -1,0 +1,160 @@
+# Release: runs when a version tag (v*) is pushed. Builds every platform on GitHub's runners (never
+# on a laptop), runs the tests first, then creates a DRAFT pre-release with:
+#   * the installers / packages and the web binaries,
+#   * SHA256SUMS,
+#   * a CycloneDX SBOM of the Rust dependencies,
+#   * SLSA build-provenance attestations for every file (verify with `gh attestation verify`).
+# Nothing is published until you review the draft and press "Publish release".
+# Binaries are not code-signed yet (no Apple Developer ID / Windows certificate); the release notes
+# say so and explain how to verify the files instead.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: build (${{ matrix.name }})
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - name: macos-universal
+            os: macos-14
+            bundles: app,dmg
+            tauri_args: --target universal-apple-darwin
+          - name: windows-x64
+            os: windows-2022
+            bundles: nsis
+            tauri_args: ""
+          - name: linux-x64
+            os: ubuntu-22.04
+            bundles: deb,rpm,appimage
+            tauri_args: ""
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Rust toolchain (from rust-toolchain.toml)
+        shell: bash
+        run: rustup toolchain install && rustc --version
+      - name: macOS targets for the universal binary
+        if: runner.os == 'macOS'
+        run: rustup target add aarch64-apple-darwin x86_64-apple-darwin
+      - name: Linux system libraries (WebKitGTK)
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev libssl-dev file
+      - name: Tests (release mode) before building anything
+        run: cargo test --workspace --exclude ctrlaltnotes-desktop --release --locked
+      - name: Tauri CLI
+        run: cargo install tauri-cli --version "^2" --locked
+      - name: Desktop app
+        shell: bash
+        env:
+          APPIMAGE_EXTRACT_AND_RUN: "1"
+        run: cargo tauri build --bundles ${{ matrix.bundles }} ${{ matrix.tauri_args }}
+      - name: Web version binary
+        run: cargo build --release --locked -p ctrlaltnotes-server
+      - name: Collect files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist
+          ver="${GITHUB_REF_NAME#v}"
+          find target -path '*/release/bundle/*' -type f \( -name '*.dmg' -o -name '*-setup.exe' -o -name '*.deb' -o -name '*.rpm' -o -name '*.AppImage' \) -exec cp {} dist/ \;
+          case "${{ runner.os }}" in
+            Windows) cp target/release/ctrlaltnotes-web.exe "dist/ctrlaltnotes-web-${ver}-windows-x64.exe" ;;
+            macOS)   cp target/release/ctrlaltnotes-web     "dist/ctrlaltnotes-web-${ver}-macos-arm64" ;;
+            Linux)   cp target/release/ctrlaltnotes-web     "dist/ctrlaltnotes-web-${ver}-linux-x64" ;;
+          esac
+          ls -la dist
+          test "$(ls dist | wc -l)" -ge 2
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: dist-${{ matrix.name }}
+          path: dist/
+          if-no-files-found: error
+          retention-days: 7
+
+  publish:
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write        # create the draft release
+      id-token: write        # sign the provenance attestations (Sigstore)
+      attestations: write    # store them on GitHub
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: dist-*
+          path: dist
+          merge-multiple: true
+      - name: SBOM (CycloneDX)
+        run: |
+          set -euo pipefail
+          rustup toolchain install
+          cargo install cargo-cyclonedx --locked
+          cargo cyclonedx --format json
+          for f in $(find . -name '*.cdx.json' -not -path './target/*' -not -path './dist/*'); do
+            cp "$f" "dist/sbom-$(basename "$f")"
+          done
+      - name: Checksums
+        run: |
+          set -euo pipefail
+          cd dist
+          sha256sum * > SHA256SUMS
+          cat SHA256SUMS
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-path: dist/*
+      - name: Draft pre-release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          cat > notes.md <<NOTES
+          **Alpha release: for testing, not for important notes yet.** Keep a copy of anything you write.
+          See the [changelog](https://github.com/${GITHUB_REPOSITORY}/blob/${GITHUB_REF_NAME}/docs/technical/18-changelog.md) and the [known limits](https://ctrlaltnotes.com/docs/technical/known-limits).
+
+          ### Files
+          | Platform | File |
+          |---|---|
+          | macOS 11+ (Apple silicon and Intel) | \`.dmg\` |
+          | Windows 10/11 | \`-setup.exe\` |
+          | Linux | \`.deb\` (Debian/Ubuntu), \`.rpm\` (Fedora), \`.AppImage\` (any) |
+          | Web version (runs locally) | \`ctrlaltnotes-web-*\` |
+
+          ### Verify before you install
+          The apps are **not code-signed yet**, so macOS and Windows will warn. Verify instead that the file is exactly what this repository built:
+
+          \`\`\`bash
+          gh attestation verify <downloaded-file> --repo ${GITHUB_REPOSITORY}
+          shasum -a 256 -c SHA256SUMS --ignore-missing
+          \`\`\`
+
+          Full steps: https://ctrlaltnotes.com/docs/guide/install-and-open
+          NOTES
+          gh release create "$GITHUB_REF_NAME" dist/* \
+            --repo "$GITHUB_REPOSITORY" \
+            --draft --prerelease --verify-tag \
+            --title "CtrlAltNotes ${GITHUB_REF_NAME#v}" \
+            --notes-file notes.md

@@ -29,7 +29,7 @@ CtrlAltNotes is one Rust backend with one front end, packaged three ways.
 | `ui/` | The one front end: HTML, CSS, vanilla JS, no framework, no build step | Shared by both hosts |
 | `brand/` | Script that generates every icon and logo | `make_brand.py` |
 
-The landing page and these docs are **not** part of the application. They live in the sibling folder `ctrlaltnotes-website/`: `site/` (landing page, built docs, SEO files), `docs-src/` (the Markdown sources and the builder) and `tools/` (the animated-screenshot recorder).
+The website (ctrlaltnotes.com: landing page and the published version of these docs) is maintained separately and is not part of the application.
 
 ## Layers and trust boundaries
 

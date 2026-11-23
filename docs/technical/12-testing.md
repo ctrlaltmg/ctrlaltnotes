@@ -12,7 +12,6 @@ order: 12
 | Server | `crates/server/tests/http.rs` | 17 raw-socket tests: headers, token, Host/Origin, smuggling, limits, slowloris, IPv6 bind |
 | Browser end-to-end | `tests/e2e_ui.py` | 90 checks of the real UI against the real server binary (Playwright, WebAuthn virtual authenticator) |
 | Markdown robustness | `tests/md_robustness.py` | Adversarial notes render quickly and never throw |
-| Media | `ctrlaltnotes-website/tools/make_media.py` | Re-records the animated screenshots from the real UI |
 
 ## Running
 

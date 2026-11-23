@@ -9,12 +9,31 @@ through the same checks, and changes to cryptography get extra review.
 * **Bugs and ideas**: open an issue first so the approach can be agreed before you write code.
 * **Code contributions**: see [Licensing of contributions](#licensing-of-contributions) below.
 
+## Project layout
+
+```
+crates/core/      cryptography, vault format, sync, ZIP export (no UI, no OS APIs)
+crates/service/   the command dispatcher every host calls (one API for all apps)
+crates/server/    web host: hardened localhost HTTP server (binary ctrlaltnotes-web)
+app/              Tauri 2 app: macOS, Windows, Linux (iOS and Android planned)
+ui/               the single front end (HTML/CSS/JS, no framework, no build step)
+docs/technical/   technical documentation, published at ctrlaltnotes.com/docs
+docs/             security design, architecture and pentest notes, README media
+brand/            icon and logo generator
+tests/            browser end-to-end and Markdown robustness tests
+scripts/check.sh  the release gate
+.github/          CI, release and Scorecard workflows, Dependabot, templates
+```
+
+Architecture in depth: [`docs/technical/01-overview.md`](docs/technical/01-overview.md). Building every target: [`docs/technical/11-building.md`](docs/technical/11-building.md).
+
 ## Development setup
 
 ```bash
 # Rust (stable, 1.80+): https://rustup.rs
 cargo install cargo-audit cargo-deny --locked
 brew install gitleaks            # or see https://github.com/gitleaks/gitleaks
+git clone https://github.com/ctrlaltmg/ctrlaltnotes.git && cd ctrlaltnotes
 cargo test                       # backend tests
 cargo run -p ctrlaltnotes-server # web version
 cargo install tauri-cli --version "^2" --locked

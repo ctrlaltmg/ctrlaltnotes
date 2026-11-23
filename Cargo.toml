@@ -10,3 +10,14 @@ codegen-units = 1
 panic = "abort"
 strip = true
 opt-level = "s"
+# keep integer-overflow panics in release builds (wrap-around bugs become crashes, not silent errors)
+overflow-checks = true
+
+[workspace.lints.rust]
+unsafe_code = "forbid"
+
+[workspace.lints.clippy]
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"
+mem_forget = "deny"

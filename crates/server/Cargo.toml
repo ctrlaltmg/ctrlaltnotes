@@ -1,6 +1,6 @@
 [package]
 name = "ctrlaltnotes-server"
-version = "0.1.0"
+version = "0.1.0-alpha.1"
 edition = "2021"
 rust-version = "1.80"
 description = "Web version: a hardened localhost-only HTTP host for the CtrlAltNotes backend (std only, no async runtime)"
@@ -14,6 +14,9 @@ path = "src/lib.rs"
 [[bin]]
 name = "ctrlaltnotes-web"
 path = "src/main.rs"
+
+[lints]
+workspace = true
 
 [dependencies]
 ctrlaltnotes-core = { path = "../core" }

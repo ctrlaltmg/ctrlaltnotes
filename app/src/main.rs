@@ -98,10 +98,29 @@ fn linux_webview_env() {
     }
 }
 
+/// The window may only show the bundled UI. Any attempt to navigate it elsewhere (a link that
+/// slipped past the opener, a script, a redirect) is refused, so a remote page can never end up in
+/// the window that holds the IPC bridge. External links open in the system browser through the
+/// opener plugin instead.
+fn navigation_allowed(url: &tauri::Url) -> bool {
+    match url.scheme() {
+        // macOS / Linux serve the UI from tauri://localhost
+        "tauri" => url.host_str() == Some("localhost"),
+        // Windows (WebView2) serves it from http(s)://tauri.localhost
+        "http" | "https" => url.host_str() == Some("tauri.localhost"),
+        "about" => url.as_str() == "about:blank",
+        _ => false,
+    }
+}
+
 fn main() {
     #[cfg(target_os = "linux")]
     linux_webview_env();
+    let navigation_guard = tauri::plugin::Builder::<tauri::Wry>::new("navigation-guard")
+        .on_navigation(|_, url| navigation_allowed(url))
+        .build();
     let app = tauri::Builder::default()
+        .plugin(navigation_guard)
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_opener::init())
         .setup(|app| {

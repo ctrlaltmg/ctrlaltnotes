@@ -6,128 +6,99 @@
 </p>
 
 <p align="center"><b>Private, end-to-end encrypted Markdown notes for Mac, Windows, Linux and the web.</b><br>
-Folders · live preview · automatic encrypted sync · fingerprint and security-key unlock</p>
+No account. No servers. No tracking. Only you can read your notes.</p>
 
-<p align="center"><img src="docs/media/live-preview.gif" alt="Writing with the side-by-side live preview" width="760"></p>
+<p align="center">
+  <a href="https://ctrlaltnotes.com">Website</a> ·
+  <a href="https://github.com/ctrlaltmg/ctrlaltnotes/releases">Download</a> ·
+  <a href="https://ctrlaltnotes.com/docs/">Documentation</a> ·
+  <a href="SECURITY.md">Security</a>
+</p>
 
-> **Status:** version 0.1.0, not independently audited. Read [Verification status](#verification-status) before relying on it.
+<p align="center">
+  <a href="https://github.com/ctrlaltmg/ctrlaltnotes/actions/workflows/ci.yml"><img src="https://github.com/ctrlaltmg/ctrlaltnotes/actions/workflows/ci.yml/badge.svg" alt="CI status"></a>
+</p>
+
+<p align="center"><img src="docs/media/live-preview.gif" alt="Writing a note with the side-by-side live preview" width="760"></p>
+
+> **Alpha (0.1.0-alpha.1).** Good for trying out, not yet for notes you cannot afford to lose; keep a copy of anything important. Not independently audited yet; see [Security](#security).
+
+## Why CtrlAltNotes
+
+- **Your notes are encrypted before they leave the app.** Each note is its own encrypted file (ChaCha20-Poly1305, key from your password with Argon2id). Your cloud provider stores only ciphertext: no titles, no text, no folder names.
+- **Sync without an account.** Use any folder your cloud already syncs (Proton Drive, iCloud Drive, Dropbox, OneDrive, Syncthing) or a single file. There is no CtrlAltNotes server.
+- **Open source, AGPL-3.0.** Every line can be read and audited, and every release is built from this repository by GitHub with checksums and build provenance.
 
 ## Features
 
-- **End-to-end encrypted.** Every note is its own file, encrypted on your device (Argon2id + ChaCha20-Poly1305). Cloud storage only sees ciphertext.
-- **Folders and sub-folders**, instant on-device search.
-- **Side-by-side live preview**: Markdown on the left, the formatted note on the right; a Preview button shows only the rendered text, and switching live preview off leaves just the editor. Supports tables, task lists, `~~strike~~`, `++underline++`, `==highlight==` and code blocks.
-- **Optional formatting toolbar** and shortcuts (Ctrl/Cmd+B, I, U, K). Live preview and toolbar can each be switched on or off in Settings.
-- **Dark, light or system theme.** Dark by default; the first option in Settings.
-- **Several vaults.** On the desktop unlock screen, *Open a different vault folder…* opens another vault or creates one in an empty folder. Each vault keeps its own sync target and settings.
-- **Start where you left off (optional).** Choose in Settings whether the app opens on a blank page or on the note you edited last.
-- **Automatic sync, on by default**, through any cloud-synced folder (Proton Drive, iCloud Drive, Dropbox, OneDrive, Syncthing) or a single `.canb` file. The on/off switch and interval live in Settings.
-- **Security key or fingerprint unlock** via WebAuthn PRF (YubiKey-style keys, Touch ID, Windows Hello where the window allows it).
-- **Export what you choose.** Tick folders and notes. Desktop apps write to a folder you pick; the web version downloads a `.md` or `.zip` to your Downloads folder. Exports are not encrypted.
-- **Modern password rules** (NIST SP 800-63B-4: 15+ characters, no composition rules, blocklist and pattern checks) plus a one-time recovery key.
-- **Mac, Windows, Linux and web** from one Rust backend and one UI. No account, no telemetry, no servers.
+- **Markdown with live preview**: Markdown on the left, the formatted note on the right; tables, task lists, `==highlight==`, `++underline++`, `~~strike~~`, code blocks. Optional formatting toolbar.
+- **Folders and sub-folders**, drag and drop, instant search on your device.
+- **Automatic encrypted sync**, on by default, with an on/off switch and interval in Settings.
+- **Unlock with a password, the recovery key, or a security key / fingerprint** (WebAuthn PRF: YubiKey, Touch ID, Windows Hello where the window allows it).
+- **Several vaults**: open a different vault folder from the unlock screen; each keeps its own sync location and settings.
+- **Dark, light or system theme** (dark by default).
+- **Auto-lock** after inactivity (1 to 120 minutes, or never), on close and on quit.
+- **Selective export** of folders and notes to plain Markdown (exports are not encrypted).
+- **Modern password rules** (NIST SP 800-63B-4: 15+ characters, no composition rules, common and patterned passwords refused) and a one-time recovery key.
 
 | Create a vault | Folders and search | Settings |
 |---|---|---|
-| ![Create vault](docs/media/create-vault.gif) | ![Folders and search](docs/media/folders-search.gif) | ![Settings](docs/media/settings.gif) |
+| ![Creating a vault](docs/media/create-vault.gif) | ![Folders and search](docs/media/folders-search.gif) | ![Settings](docs/media/settings.gif) |
 
-## Documentation
+## Download and install
 
-* **Technical documentation** (architecture, vault format, cryptography, sync, API, security model): [`docs/technical/`](docs/technical/), in this repository so that code and docs change together.
-* **User guide and landing page**: the separate `ctrlaltnotes-website` repository. Its build reads `docs/technical/` from this repository and publishes both.
-* **Security design notes**: [`docs/security-design.md`](docs/security-design.md). **Reporting a vulnerability**: [`SECURITY.md`](SECURITY.md).
+Download from the [releases page](https://github.com/ctrlaltmg/ctrlaltnotes/releases):
 
-## Quick start
+| System | File |
+|---|---|
+| macOS 11+ (Apple silicon and Intel) | `CtrlAltNotes_…_universal.dmg` |
+| Windows 10 / 11 | `CtrlAltNotes_…_x64-setup.exe` |
+| Linux | `.deb` (Debian, Ubuntu), `.rpm` (Fedora), `.AppImage` (any distribution) |
+| Web version (runs only on your computer) | `ctrlaltnotes-web-…` |
 
-Install Rust from <https://rustup.rs>.
-
-```bash
-cargo test                                   # run the tests first
-cargo run --release -p ctrlaltnotes-server    # web version: prints a link and opens your browser
-```
-
-The web binary is `ctrlaltnotes-web` (`target/release/ctrlaltnotes-web`). Options: `--vault <dir>`, `--sync-folder <dir>`, `--sync-file <file>`, `--port <n>`, `--idle-lock <seconds>`, `--no-open`. The link carries a one-time token after `#`; the page removes it from the address bar.
-
-### Mac app
+**Verify before installing.** The alpha is not code-signed yet, so macOS and Windows will warn. Check that your download is exactly what GitHub built from this source. Download `SHA256SUMS` from the same release, then:
 
 ```bash
-xcode-select --install
-cargo install tauri-cli --version "^2" --locked
-cargo tauri build            # output: target/release/bundle/macos and /dmg
+shasum -a 256 -c SHA256SUMS --ignore-missing     # macOS / Linux: the file must report OK
 ```
 
-Universal build: `rustup target add aarch64-apple-darwin x86_64-apple-darwin && cargo tauri build --target universal-apple-darwin`.
-Unsigned builds are blocked by Gatekeeper at first launch: right-click → **Open**, or `xattr -dr com.apple.quarantine /Applications/CtrlAltNotes.app`.
+On Windows: `Get-FileHash <file> -Algorithm SHA256` and compare with `SHA256SUMS`. Every file also has a signed [build-provenance attestation](https://github.com/ctrlaltmg/ctrlaltnotes/attestations).
 
-### Windows app (build on Windows)
-
-Install Visual Studio Build Tools (Desktop development with C++) and Rust, then in PowerShell:
-
-```powershell
-cargo install tauri-cli --version "^2" --locked
-cargo tauri build            # output: target\release\bundle\nsis and \msi
-```
-
-Unsigned installers trigger SmartScreen ("More info" → "Run anyway").
-
-### Linux app (build on Linux)
-
-Install the WebKitGTK toolchain, Rust, then build. Debian/Ubuntu (22.04+):
-
-```bash
-sudo apt install build-essential curl file pkg-config libssl-dev \
-  libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libxdo-dev
-cargo install tauri-cli --version "^2" --locked
-cargo tauri build            # output: target/release/bundle/deb, /rpm and /appimage
-```
-
-Fedora: `sudo dnf install gcc pkgconf-pkg-config openssl-devel webkit2gtk4.1-devel gtk3-devel librsvg2-devel libxdo-devel`. Arch: `sudo pacman -S --needed base-devel webkit2gtk-4.1 gtk3 librsvg xdotool openssl`.
-The vault lives in `~/.local/share/app.ctrlaltnotes.desktop/` (the web version uses `$XDG_DATA_HOME/ctrlaltnotes/vault`).
-
-More detail: [`docs/technical/11-building.md`](docs/technical/11-building.md).
+Step-by-step installation, including the first-launch warnings: **[Install and open](https://ctrlaltnotes.com/docs/guide/install-and-open)**.
 
 ## Using it
 
-1. **Create the vault in the window.** Choose a password and save the recovery key shown once. Without the password or recovery key nobody, including the developers, can open your notes.
-2. **Sync.** The app offers to pick a sync location right after creation. Switch automatic sync off in *Settings → Sync*.
-3. **Second computer.** Choose *I already have a vault in my cloud storage*, enter the password, pick the synced folder.
-4. **Lock.** Auto-locks after 5 minutes idle by default (selectable from 1 to 120 minutes, or Never), on close and on quit. Ctrl/Cmd+L locks.
+1. **Create your vault.** Choose a password of 15+ characters and save the recovery key shown once. Without the password or the recovery key nobody, including the developers, can open your notes.
+2. **Choose a sync location** (optional). Pick a folder your cloud service syncs; notes then sync automatically, always encrypted.
+3. **Add another computer.** Install the app, choose *I already have a vault in my cloud storage*, enter the password and pick the same folder.
+4. **Lock** with `Ctrl`/`Cmd` + `L`. The app also locks itself when idle, when the window closes and on quit.
 
-## Project layout
+Shortcuts: `Ctrl`/`Cmd` + `B` sidebar, `E` preview, `L` lock. The full **[user guide](https://ctrlaltnotes.com/docs/guide/start-here)** covers writing, sync, security keys, export and settings.
 
-```
-crates/core/      crypto, vault format, sync, zip export (no UI, no OS APIs)
-crates/service/   the command dispatcher every host calls
-crates/server/    web host: hardened localhost HTTP server (binary ctrlaltnotes-web)
-app/              Tauri 2 app: macOS, Windows, Linux (iOS and Android planned)
-ui/               the single front end (HTML/CSS/JS, no framework, no build step)
-docs/technical/   technical documentation (published on the website)
-docs/             security design, architecture and pentest notes, media
-brand/            icon and logo generator
-tests/            browser end-to-end and Markdown robustness tests
-scripts/check.sh  the release gate (run before every commit)
-.github/          CI, Dependabot, issue and PR templates
-```
+## Documentation
 
-## Verification status
+| | |
+|---|---|
+| User guide | [ctrlaltnotes.com/docs/guide](https://ctrlaltnotes.com/docs/guide/start-here) |
+| Technical documentation (architecture, vault format, cryptography, sync, API) | [`docs/technical/`](docs/technical/) · [online](https://ctrlaltnotes.com/docs/technical/overview) |
+| Build from source | [`docs/technical/11-building.md`](docs/technical/11-building.md) |
+| Contributing and development setup | [`CONTRIBUTING.md`](CONTRIBUTING.md) |
+| Changelog | [`docs/technical/18-changelog.md`](docs/technical/18-changelog.md) |
 
-Be aware of what was and was not run:
+## Security
 
-- Every change goes through the release gate `scripts/check.sh` (rustfmt, `clippy --all-targets -D warnings`, release tests including the RFC known-answer and NFKC tests with the real crypto crates, `cargo audit`, JS syntax). CI (`.github/workflows/ci.yml`) runs it on Linux, macOS and Windows.
-- The macOS app is built and used on macOS. The **Windows and Linux bundles have not yet been built on those systems**; CI compiles the desktop crate on both.
-- WebAuthn inside the **Mac app window** may be refused by Apple's WebKit; the password still works. The web version supports it.
-- Not independently audited. The author's penetration test found 19 issues, most fixed with regression tests; the rest are documented in [known limits](docs/technical/15-known-limits.md).
-- No Android or iOS app in this edition.
+- **Report a vulnerability privately**: [Security → Report a vulnerability](https://github.com/ctrlaltmg/ctrlaltnotes/security/advisories/new). Please do not open public issues for security problems. Policy and response times: [`SECURITY.md`](SECURITY.md).
+- **How it is protected**: [security model](docs/technical/13-security-model.md), [cryptography](docs/technical/03-cryptography.md), [hardening checklist](docs/technical/19-hardening.md).
+- **Honest status**: built on audited RustCrypto libraries and tested on every change (formatting, lints, tests including RFC known-answer tests, dependency advisories and licenses, secret scanning), and penetration-tested by the author ([report](docs/technical/14-pentest-report.md)). It has **not** had an independent audit yet. Known limits: [`docs/technical/15-known-limits.md`](docs/technical/15-known-limits.md).
 
-Full detail: [`docs/security-design.md`](docs/security-design.md).
+## Contributing
+
+Bug reports, reproductions and documentation feedback are welcome as [issues](https://github.com/ctrlaltmg/ctrlaltnotes/issues). Code contributions will need a Contributor License Agreement (because the apps are also distributed through app stores); see [`CONTRIBUTING.md`](CONTRIBUTING.md). Everyone is expected to follow the [code of conduct](CODE_OF_CONDUCT.md).
 
 ## License
 
 Copyright (C) 2026 CtrlAltNotes contributors.
 
-CtrlAltNotes is free software under the [GNU Affero General Public License v3.0 only](LICENSE)
-(`AGPL-3.0-only`), the same license family as Signal and Standard Notes. You may use, study,
-share and modify it; if you distribute a modified version, or let others use it over a network,
-you must publish your source code under the same license.
+CtrlAltNotes is free software under the [GNU Affero General Public License v3.0 only](LICENSE) (`AGPL-3.0-only`), the same license family as Signal and Standard Notes. You may use, study, share and modify it; if you distribute a modified version, or let others use it over a network, you must publish its source code under the same license.
 
-The name and logo are not covered by the license: see [TRADEMARKS.md](TRADEMARKS.md).
+The name and logo are not covered by the license: see [`TRADEMARKS.md`](TRADEMARKS.md).

@@ -1,13 +1,24 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Permissions of the main window. File dialogs are opened by the Rust side only; the page cannot ask for paths. The opener may only open web/mail links (never files, never reveal-in-folder).",
-  "windows": ["main"],
+  "description": "Least privilege: the window gets no core Tauri permissions. The UI talks to the backend only through the app's own `rpc` command; file dialogs are opened by the Rust side, never by the page. The opener may only open web and mail links in the system browser (never files, never reveal-in-folder).",
+  "windows": [
+    "main"
+  ],
   "permissions": [
-    "core:default",
     {
       "identifier": "opener:allow-open-url",
-      "allow": [{ "url": "https://*" }, { "url": "http://*" }, { "url": "mailto:*" }]
+      "allow": [
+        {
+          "url": "https://*"
+        },
+        {
+          "url": "http://*"
+        },
+        {
+          "url": "mailto:*"
+        }
+      ]
     }
   ]
 }

@@ -26,3 +26,8 @@ order: 15
 * A body near the 4 MiB limit can fail to save because JSON escaping can triple its size.
 * A raised Argon2 cost above the default does not propagate automatically to a second device (staged headers are capped at `max(local, default)`).
 * Android and iOS are **not** part of this Rust edition.
+
+## Platform notes
+
+* **Security-key unlock in the Mac app window** may be refused by Apple's WebKit for unsigned apps; the password and recovery key always work, and the web version supports security keys.
+* **Windows and Linux** desktop builds are produced by CI but have had less day-to-day use than the macOS app.
