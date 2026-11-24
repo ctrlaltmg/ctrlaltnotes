@@ -14,6 +14,14 @@ updates:
         update-types: ["version-update:semver-minor", "version-update:semver-major"]
       - dependency-name: chacha20poly1305
         update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      # sha2 0.11 and hkdf 0.13 need each other (digest 0.11), and getrandom 0.3+ renamed its API:
+      # migrate them together in one pull request, proven by the known-answer tests
+      - dependency-name: sha2
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: hkdf
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
+      - dependency-name: getrandom
+        update-types: ["version-update:semver-minor", "version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:
