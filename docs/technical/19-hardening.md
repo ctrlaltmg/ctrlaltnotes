@@ -74,7 +74,7 @@ Loopback only, a random launch token, Host and Origin checks, request size and t
 ## Open items
 
 1. **Independent security audit** before calling the app production-ready (Open Technology Fund Red Team Lab or OSTIF can fund it).
-2. **Fuzzing** of the parsers that read untrusted cloud files (vault header, object files, bundle, ZIP writer input, Markdown renderer) with `cargo fuzz`.
+2. **Fuzzing**: done for the vault header, object files, the seal/open round trip, padding, bundle files, and password and base64 input (`crates/core/fuzz`, CI workflow `fuzz`). Still to add: the quick-unlock file, the ZIP export writer, and the Markdown renderer (covered for now by `tests/md_robustness.py`).
 3. **Release integrity**:
    * build in CI only;
    * code signing (Apple Developer ID and notarization, Windows Authenticode);

@@ -82,7 +82,7 @@ fn pack(remote: &Path) -> Result<Vec<u8>> {
     Ok(out)
 }
 
-fn unpack(blob: &[u8], dest: &Path) -> Result<()> {
+pub(crate) fn unpack(blob: &[u8], dest: &Path) -> Result<()> {
     if blob.len() < 4 + 4 + 32 || &blob[..4] != BUNDLE_MAGIC || blob.len() > MAX_BUNDLE_BYTES {
         return Err(invalid());
     }

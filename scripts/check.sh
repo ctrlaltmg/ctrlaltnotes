@@ -11,6 +11,7 @@ step() { printf '\n== %s\n' "$1"; }
 
 step "rustfmt"
 cargo fmt --all -- --check
+cargo fmt --manifest-path crates/core/fuzz/Cargo.toml -- --check   # fuzz targets (own workspace)
 
 step "clippy (all crates, all targets, warnings are errors)"
 cargo clippy --workspace --all-targets --locked -- -D warnings

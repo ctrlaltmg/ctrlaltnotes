@@ -22,11 +22,13 @@ getrandom = "0.2"
 base64 = "0.23"
 hex = "0.4"
 unicode-normalization = "0.1"
-serde_json = "1"
+serde_json = { version = "1", features = ["float_roundtrip"] }   # exact float parsing: canonical JSON must read back identically (found by fuzzing)
 
 [features]
 # Only for the test-suite (forging merged states); never enabled in the apps.
 test-hooks = []
+# Only for the fuzz targets in crates/core/fuzz (exposes private parsers); never enabled in the apps.
+fuzzing = []
 
 [dev-dependencies]
 tempfile = "3"

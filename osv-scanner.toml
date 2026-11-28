@@ -1,0 +1,35 @@
+# Advisories reviewed and accepted, read by OSV-Scanner and OpenSSF Scorecard.
+# None of these is an exploitable vulnerability in CtrlAltNotes: they are "unmaintained" or
+# "unsound" notices in crates that Tauri pulls in, with no fixed version we can move to.
+# `cargo audit` (scripts/check.sh) still lists every one of them as a warning on each run.
+# Every entry expires: when it does, check the advisory again and renew, fix or remove it.
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0429"
+ignoreUntil = 2027-05-31
+reason = "glib 0.18 VariantStrIter unsoundness: Variant::array_iter_str() is not called by CtrlAltNotes or any dependency (checked 2026-11-23). Linux-only, via Tauri's GTK3 stack; fixed in glib 0.20, which needs Tauri to move to GTK4. Dependabot alert dismissed for the same reason."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2024-0370"
+ignoreUntil = 2027-05-31
+reason = "proc-macro-error is unmaintained (no vulnerability). Build-time only, via glib-macros in Tauri's Linux GTK3 stack."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0371"
+ignoreUntil = 2027-05-31
+reason = "zbus_names is unmaintained (no vulnerability). Linux-only D-Bus support inside Tauri; no fixed version."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0370"
+ignoreUntil = 2027-05-31
+reason = "zvariant is unmaintained (no vulnerability). Linux-only D-Bus support inside Tauri; no fixed version."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0372"
+ignoreUntil = 2027-05-31
+reason = "zvariant_derive is unmaintained (no vulnerability). Build-time macro for zvariant, Linux-only via Tauri."
+
+[[IgnoredVulns]]
+id = "RUSTSEC-2026-0543"
+ignoreUntil = 2027-05-31
+reason = "chrono is unmaintained (no vulnerability). Listed in Cargo.lock as an optional dependency of serde_with (used by tauri-utils) but not compiled into any CtrlAltNotes binary: cargo tree finds no path to it."

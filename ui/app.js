@@ -603,7 +603,7 @@
     const out = lines.map((l) => (has ? (numbered ? l.replace(/^\d+\.\s/, '') : l.slice(prefix.length)) : (numbered ? (++n) + '. ' + l : prefix + l))).join('\n');
     return { value: v.slice(0, a) + out + v.slice(z), start: a, end: a + out.length };
   };
-  const block = (text) => (v, s, e) => { const sel = v.slice(s, e); const t = text.replace('$', sel || 'code'); return { value: v.slice(0, s) + t + v.slice(e), start: s + 4, end: s + 4 + (sel || 'code').length }; };
+  const block = (text) => (v, s, e) => { const sel = v.slice(s, e); const t = text.replace('$', () => sel || 'code'); /* function form: "$&", "$'" in the selection stay literal */ return { value: v.slice(0, s) + t + v.slice(e), start: s + 4, end: s + 4 + (sel || 'code').length }; };
   const insertAt = (text) => (v, s, e) => ({ value: v.slice(0, s) + text + v.slice(e), start: s + text.length, end: s + text.length });
   const link = (v, s, e) => { const sel = v.slice(s, e) || 'link text'; const t = '[' + sel + '](https://)'; return { value: v.slice(0, s) + t + v.slice(e), start: s + sel.length + 3, end: s + sel.length + 11 }; };
   const TOOLS = [

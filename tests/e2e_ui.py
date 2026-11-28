@@ -109,22 +109,27 @@ try:
         expect(page.locator("#preview strong")).to_have_text("bold")
         boxes = page.evaluate("(() => { const a = document.querySelector('.split textarea').getBoundingClientRect(), b = document.querySelector('#preview').getBoundingClientRect(); return [a.right, b.left, Math.abs(a.top - b.top)]; })()")
         check("editor on the left, preview on the right, same height: %r" % boxes, boxes[0] <= boxes[1] + 1 and boxes[2] < 40)
-        ta.press("Control+a"); ta.press("Delete")
+        ta.press("ControlOrMeta+a"); ta.press("Delete")
         ta.fill("select me")
-        ta.press("Control+a")
+        ta.press("ControlOrMeta+a")
         page.get_by_role("button", name="Bold (Ctrl/Cmd+B)").click()
         check("toolbar Bold wraps the selection", ta.input_value() == "**select me**")
         page.get_by_role("button", name="Bold (Ctrl/Cmd+B)").click()
         check("toolbar Bold toggles off", ta.input_value() == "select me")
-        ta.press("Control+a"); ta.press("Control+u")
+        ta.press("ControlOrMeta+a"); ta.press("Control+u")
         check("Ctrl+U underlines", ta.input_value() == "++select me++")
         expect(page.locator("#preview u")).to_have_text("select me")
-        ta.fill("a"); ta.press("Control+a"); page.get_by_role("button", name="Highlight").click()
+        ta.fill("a"); ta.press("ControlOrMeta+a"); page.get_by_role("button", name="Highlight").click()
         expect(page.locator("#preview mark")).to_have_count(1); check("highlight extended syntax")
-        ta.press("Control+a"); ta.press("Delete")
+        ta.press("ControlOrMeta+a"); ta.press("Delete")
         page.get_by_role("button", name="Table", exact=True).click()
         expect(page.locator("#preview table th")).to_have_count(2); check("table button inserts a rendered table")
-        ta.press("Control+a"); ta.press("Delete")
+        ta.press("ControlOrMeta+a"); ta.press("Delete")
+        shell = "echo $'a b' && x=$& $` $$"   # JavaScript replacement patterns must stay literal
+        ta.fill(shell); ta.press("ControlOrMeta+a")
+        page.get_by_role("button", name="Code block", exact=True).click()
+        check("code block keeps $' $& $` $$ in the selection unchanged", ta.input_value() == "\n```\n" + shell + "\n```\n")
+        ta.press("ControlOrMeta+a"); ta.press("Delete")
         ta.fill("- [ ] one\n- [x] two\n\n~~old~~ <img src=x onerror=alert(1)> [x](javascript:alert(1)) [ok](https://example.com)")
         expect(page.locator("#preview input[type=checkbox]")).to_have_count(2)
         check("no raw html element created from note text", page.locator("#preview img").count() == 0)
@@ -246,10 +251,12 @@ try:
         check("with auto-sync off there is still no Sync button", page.get_by_role("button", name="Sync", exact=True).count() == 0)
         # switching it back on syncs by itself, no click needed
         page.get_by_role("button", name="Settings").click(); page.locator("#set-auto_sync").click(); page.get_by_role("button", name="Close settings").click()
+        # sync writes each object to ".tmp-…" and renames it into place: count only finished objects
+        done = lambda: [f for f in os.listdir(os.path.join(cloud, "objects")) if not f.startswith(".tmp-")] if os.path.isdir(os.path.join(cloud, "objects")) else []
         for _ in range(40):
-            if os.path.isdir(os.path.join(cloud, "objects")) and len(os.listdir(os.path.join(cloud, "objects"))) >= 2: break
+            if len(done()) >= 2: break
             page.wait_for_timeout(250)
-        cloud_files = os.listdir(os.path.join(cloud, "objects"))
+        cloud_files = done()
         check("encrypted objects reached the sync folder", len(cloud_files) >= 2 and all(f.endswith(".can") for f in cloud_files))
         for f in cloud_files:
             check("cloud file has no plaintext: " + f[:6], b"Plan" not in open(os.path.join(cloud, "objects", f), "rb").read())
