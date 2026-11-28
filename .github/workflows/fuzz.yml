@@ -1,0 +1,60 @@
+# Fuzzes the parsers that read untrusted input: vault.json and .can files from the sync folder,
+# bundle files from cloud storage, padding, passwords and base64 (crates/core/fuzz).
+# Not a required check: fuzzing needs a nightly compiler, which must never block a merge.
+name: fuzz
+
+on:
+  pull_request:
+    paths: ["crates/core/**", ".github/workflows/fuzz.yml"]
+  push:
+    branches: [main]
+    paths: ["crates/core/**", ".github/workflows/fuzz.yml"]
+  schedule:
+    - cron: "17 4 * * 1"   # every Monday: longer runs find what short runs miss
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: fuzz-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  # Exact nightly (bump deliberately, like rust-toolchain.toml); only used to build the fuzzers.
+  NIGHTLY: nightly-2026-11-28
+  CARGO_FUZZ: 0.13.2
+
+jobs:
+  fuzz:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Install nightly and cargo-fuzz
+        run: |
+          rustup toolchain install "$NIGHTLY" --profile minimal
+          cargo +"$NIGHTLY" install cargo-fuzz --version "$CARGO_FUZZ" --locked
+      - name: Build the fuzz targets
+        working-directory: crates/core/fuzz
+        run: cargo +"$NIGHTLY" fuzz build
+      - name: Run every target
+        working-directory: crates/core/fuzz
+        env:
+          SECONDS_EACH: ${{ github.event_name == 'schedule' && '600' || '120' }}
+        run: |
+          for t in $(cargo +"$NIGHTLY" fuzz list); do
+            echo "::group::$t ($SECONDS_EACH s)"
+            cargo +"$NIGHTLY" fuzz run "$t" -- -max_total_time="$SECONDS_EACH" -rss_limit_mb=2048
+            echo "::endgroup::"
+          done
+      - name: Keep the failing inputs
+        if: failure()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: fuzz-crashes
+          path: crates/core/fuzz/artifacts/
+          if-no-files-found: ignore
+          retention-days: 30

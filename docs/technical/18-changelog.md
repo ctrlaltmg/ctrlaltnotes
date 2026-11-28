@@ -5,6 +5,12 @@ order: 18
 ---
 # Changelog
 
+## Unreleased
+
+* **Fuzzing** of the parsers that read untrusted files (`crates/core/fuzz`, 6 targets, CI workflow `fuzz`).
+* Fix (found by fuzzing): some floating-point numbers in JSON came back one digit different after encrypting and decrypting an object. JSON is now parsed exactly (`serde_json` `float_roundtrip`). The app itself stores no floats, so no vault was affected.
+* Fix: the Code block button mangled selected text that contained `$'`, `$&` or `` $` `` (for example shell snippets).
+
 ## 0.1.0-alpha.1
 
 First public release, for testing. Not code-signed yet; verify downloads as described in [Install and open](../guide/02-install-and-open.md).

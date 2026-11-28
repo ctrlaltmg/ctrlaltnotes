@@ -19,6 +19,24 @@ pub mod sync;
 pub mod vault;
 pub mod zip;
 
+/// Entry points for the fuzz targets in `crates/core/fuzz`. Only built with the `fuzzing`
+/// feature, which the apps never enable.
+#[cfg(feature = "fuzzing")]
+#[doc(hidden)]
+pub mod fuzzing {
+    use std::path::Path;
+
+    /// Bundle reader (bundle files come from untrusted cloud storage).
+    pub fn bundle_unpack(blob: &[u8], dest: &Path) -> crate::Result<()> {
+        crate::bundle::unpack(blob, dest)
+    }
+
+    /// Length-prefix padding check run on every decrypted object.
+    pub fn unpad(padded: &[u8]) -> crate::Result<&[u8]> {
+        crate::crypto::unpad(padded)
+    }
+}
+
 pub use bundle::{join_from_bundle, sync_bundle};
 pub use crypto::{KdfParams, KDF_DEFAULT, KDF_MIN};
 pub use error::{Result, VaultError};

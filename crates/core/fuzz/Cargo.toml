@@ -1,0 +1,69 @@
+# Fuzz targets for the parsers that read untrusted input (sync folder, bundles, passwords).
+# Run:  cd crates/core/fuzz && cargo +nightly fuzz run <target> -- -max_total_time=60
+# (needs a nightly toolchain and `cargo install cargo-fuzz --locked`; CI runs them in the `fuzz` workflow)
+[package]
+name = "ctrlaltnotes-core-fuzz"
+version = "0.0.0"
+edition = "2021"
+license = "AGPL-3.0-only"
+publish = false
+
+[package.metadata]
+cargo-fuzz = true
+
+[dependencies]
+libfuzzer-sys = "0.4.13"
+serde_json = "1"
+sha2 = "0.10"
+tempfile = "3"
+ctrlaltnotes-core = { path = "..", features = ["fuzzing"] }
+
+# Its own workspace: never part of the app build, the release build or the root Cargo.lock.
+[workspace]
+members = ["."]
+
+[profile.release]
+debug = 1
+overflow-checks = true
+
+[[bin]]
+name = "vault_header"
+path = "fuzz_targets/vault_header.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "sealed_object"
+path = "fuzz_targets/sealed_object.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "seal_roundtrip"
+path = "fuzz_targets/seal_roundtrip.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "unpad"
+path = "fuzz_targets/unpad.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "bundle_unpack"
+path = "fuzz_targets/bundle_unpack.rs"
+test = false
+doc = false
+bench = false
+
+[[bin]]
+name = "password_and_base64"
+path = "fuzz_targets/password_and_base64.rs"
+test = false
+doc = false
+bench = false

@@ -220,7 +220,7 @@ fn pad(plain: &[u8]) -> Vec<u8> {
     v
 }
 
-fn unpad(padded: &[u8]) -> Result<&[u8]> {
+pub(crate) fn unpad(padded: &[u8]) -> Result<&[u8]> {
     if padded.len() < 4 {
         return Err(corrupt());
     }
